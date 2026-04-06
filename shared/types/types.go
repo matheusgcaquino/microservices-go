@@ -1,16 +1,20 @@
 package types
 
+type Routes struct {
+	Routes []*Route
+}
+
 type Route struct {
-	Distance float64     `json:"distance"`
-	Duration float64     `json:"duration"`
-	Geometry []*Geometry `json:"geometry"`
+	Distance float64
+	Duration float64
+	Geometry *Geometry
 }
 
 type Geometry struct {
-	Coordinates []*Coordinate `json:"coordinates"`
+	Coordinates []*Coordinates
 }
 
-type Coordinate struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+type Coordinates struct {
+	Longitude float64
+	Latitude  float64
 }

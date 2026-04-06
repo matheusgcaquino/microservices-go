@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"ride-sharing/services/trip-service/internal/domain"
+	"ride-sharing/shared/types"
 
 	"github.com/google/uuid"
 )
@@ -11,13 +12,19 @@ type TripRepository interface {
 	SaveTrip(ctx context.Context, trip *domain.TripModel) (*domain.TripModel, error)
 }
 
-type TripService struct {
-	repo TripRepository
+type Router interface {
+	GetRoutes(ctx context.Context, pickup, destination *types.Coordinates) (*types.Routes, error)
 }
 
-func NewTripService(repo TripRepository) *TripService {
+type TripService struct {
+	repo   TripRepository
+	router Router
+}
+
+func NewTripService(repo TripRepository, router Router) *TripService {
 	return &TripService{
-		repo: repo,
+		repo:   repo,
+		router: router,
 	}
 }
 
@@ -30,4 +37,8 @@ func (s *TripService) CreateTrip(ctx context.Context, rideFare *domain.RideFareM
 
 	s.repo.SaveTrip(ctx, trip)
 	return trip, nil
+}
+
+func (s *TripService) GetRoutes(ctx context.Context, pickup, destination *types.Coordinates) (*types.Routes, error) {
+	return s.router.GetRoutes(ctx, pickup, destination)
 }

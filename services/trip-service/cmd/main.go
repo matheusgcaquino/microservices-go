@@ -1,32 +1,27 @@
 package main
 
 import (
-	"context"
 	"log"
+	"net/http"
+	h "ride-sharing/services/trip-service/internal/infrastructure/http"
 	"ride-sharing/services/trip-service/internal/infrastructure/repository"
 	"ride-sharing/services/trip-service/internal/service"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 func main() {
-	ctx := context.Background()
 	inmemRepository := repository.NewInmemRepository()
+	tripService := service.NewTripService(inmemRepository, &h.OsrmRouter{})
+	mux := http.NewServeMux()
 
-	rideFareService := service.NewRideFareService(inmemRepository)
-	rideFare, _ := rideFareService.CreateRideFare(ctx, uuid.NewString(), uuid.NewString(), 234.656)
+	httphandler := h.HttpHandler{Service: *tripService}
+	mux.HandleFunc("POST /preview", httphandler.HandleTripPreview)
+	server := &http.Server{
+		Addr:    ":8083",
+		Handler: mux,
+	}
 
-	log.Print("Ride: ")
-	log.Println(rideFare)
+	if err := server.ListenAndServe(); err != nil {
+		log.Printf("HTTP server error: %v", err)
 
-	tripService := service.NewTripService(inmemRepository)
-	trip, _ := tripService.CreateTrip(ctx, rideFare)
-
-	log.Print("Trip: ")
-	log.Println(trip)
-
-	for {
-		time.Sleep(time.Second)
 	}
 }
