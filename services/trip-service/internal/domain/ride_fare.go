@@ -13,6 +13,7 @@ type RideFareModel struct {
 	UserID            string
 	PackageSlug       string
 	TotalPriceInCents float64
+	Route             *types.Route
 }
 
 func NewRideFare(
@@ -20,12 +21,14 @@ func NewRideFare(
 	id string,
 	userID string,
 	PackageSlug string,
-	totalPriceInCents float64) (*RideFareModel, error) {
+	totalPriceInCents float64,
+	Route *types.Route) (*RideFareModel, error) {
 	return &RideFareModel{
 		ID:                id,
 		UserID:            userID,
 		PackageSlug:       PackageSlug,
 		TotalPriceInCents: totalPriceInCents,
+		Route:             Route,
 	}, nil
 }
 
@@ -41,6 +44,7 @@ func GetRideFares(ctx context.Context, userID string, routes *types.Routes) []*R
 			userID,
 			estimatedFare.PackageSlug,
 			estimatedFare.TotalPriceInCents,
+			routes.Routes[0],
 		)
 	}
 

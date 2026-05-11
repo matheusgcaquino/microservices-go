@@ -7,6 +7,7 @@ type TripModel struct {
 	UserID   string
 	Status   string
 	RideFare *RideFareModel
+	Driver   *DriverModel
 }
 
 func NewTrip(
@@ -18,5 +19,6 @@ func NewTrip(
 		UserID:   rideFare.UserID,
 		Status:   "PENDING",
 		RideFare: rideFare,
+		Driver:   nil,
 	}, nil
 }

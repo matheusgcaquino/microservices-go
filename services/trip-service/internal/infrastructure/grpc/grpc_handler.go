@@ -47,12 +47,15 @@ func (h *gRPCHandler) PreviewTrip(ctx context.Context, req *pb.PreviewTripReques
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	return &pb.PreviewTripResponse{
-		Route:     RoutesToProto(routes),
-		RideFares: ToRideFaresProto(rideFares),
-	}, nil
+	return PreviewTripResponse(rideFares, routes), nil
 }
 
 func (h *gRPCHandler) CreateTrip(ctx context.Context, req *pb.CreateTripRequest) (*pb.CreateTripResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "CreateTrip method is not implemented yet")
+	trip, err := h.service.CreateTrip(ctx, req.GetUserID(), req.GetRideFareID())
+	if err != nil {
+		log.Println(err)
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	return CreateTripResponse(trip), nil
 }

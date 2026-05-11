@@ -13,6 +13,7 @@ import (
 type TripRepository interface {
 	SaveTrip(ctx context.Context, trip *domain.TripModel) error
 	SaveRideFare(ctx context.Context, rideFare *domain.RideFareModel) error
+	GetRideFare(ctx context.Context, userID string, rideFareId string) (*domain.RideFareModel, error)
 }
 
 type Router interface {
@@ -31,14 +32,22 @@ func NewTripService(repo TripRepository, router Router) *TripService {
 	}
 }
 
-func (s *TripService) CreateTrip(ctx context.Context, rideFare *domain.RideFareModel) (*domain.TripModel, error) {
+func (s *TripService) CreateTrip(ctx context.Context, userID string, rideFareId string) (*domain.TripModel, error) {
+	rideFare, err := s.repo.GetRideFare(ctx, userID, rideFareId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ride fare: %w", err)
+	}
 
 	trip, error := domain.NewTrip(ctx, uuid.NewString(), rideFare)
 	if error != nil {
 		return nil, error
 	}
 
-	s.repo.SaveTrip(ctx, trip)
+	err = s.repo.SaveTrip(ctx, trip)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save trip: %w", err)
+	}
+
 	return trip, nil
 }
 
