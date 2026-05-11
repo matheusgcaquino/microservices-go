@@ -39,15 +39,20 @@ func (h *gRPCHandler) PreviewTrip(ctx context.Context, req *pb.PreviewTripReques
 		Latitude:  destination.Latitude,
 		Longitude: destination.Longitude,
 	}
+	userID := req.GetUserID()
 
-	tripPreview, err := h.service.GetRoutes(ctx, pickupCoord, destinationCoord)
+	rideFares, routes, err := h.service.PreviewTrip(ctx, userID, pickupCoord, destinationCoord)
 	if err != nil {
 		log.Println(err)
-		return nil, status.Errorf(codes.Internal, "failed to get route: %v", err)
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	return &pb.PreviewTripResponse{
-		Route:     tripPreview.ToProto(),
-		RideFares: []*pb.RideFare{},
+		Route:     RoutesToProto(routes),
+		RideFares: ToRideFaresProto(rideFares),
 	}, nil
+}
+
+func (h *gRPCHandler) CreateTrip(ctx context.Context, req *pb.CreateTripRequest) (*pb.CreateTripResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "CreateTrip method is not implemented yet")
 }

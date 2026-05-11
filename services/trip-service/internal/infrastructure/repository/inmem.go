@@ -17,12 +17,12 @@ func NewInmemRepository() *inmemRepository {
 	}
 }
 
-func (repo *inmemRepository) SaveTrip(ctx context.Context, trip *domain.TripModel) (*domain.TripModel, error) {
+func (repo *inmemRepository) SaveTrip(ctx context.Context, trip *domain.TripModel) error {
 	repo.trips[trip.ID] = trip
-	return trip, nil
+	return nil
 }
 
-func (repo *inmemRepository) SaveRideFare(ctx context.Context, rideFare *domain.RideFareModel) (*domain.RideFareModel, error) {
+func (repo *inmemRepository) SaveRideFare(ctx context.Context, rideFare *domain.RideFareModel) error {
 	repo.rideFares[rideFare.ID] = rideFare
-	return rideFare, nil
+	return nil
 }

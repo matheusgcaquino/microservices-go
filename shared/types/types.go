@@ -1,7 +1,5 @@
 package types
 
-import pb "ride-sharing/shared/proto/trip"
-
 type Routes struct {
 	Routes []*Route
 }
@@ -19,26 +17,4 @@ type Geometry struct {
 type Coordinates struct {
 	Longitude float64
 	Latitude  float64
-}
-
-func (o *Routes) ToProto() *pb.Route {
-	route := o.Routes[0]
-	geometry := route.Geometry.Coordinates
-	coordinates := make([]*pb.Coordinate, len(geometry))
-	for i, coord := range geometry {
-		coordinates[i] = &pb.Coordinate{
-			Latitude:  coord.Latitude,
-			Longitude: coord.Longitude,
-		}
-	}
-
-	return &pb.Route{
-		Geometry: []*pb.Geometry{
-			{
-				Coordinates: coordinates,
-			},
-		},
-		Distance: route.Distance,
-		Duration: route.Duration,
-	}
 }

@@ -28,3 +28,15 @@ type Coordinates struct {
 	Longitude float64 `json:"longitude"`
 	Latitude  float64 `json:"latitude"`
 }
+
+type startTripRequest struct {
+	RideFareID string `json:"rideFareID"`
+	UserID     string `json:"userID"`
+}
+
+func (c *startTripRequest) toProto() *pb.CreateTripRequest {
+	return &pb.CreateTripRequest{
+		RideFareID: c.RideFareID,
+		UserID:     c.UserID,
+	}
+}

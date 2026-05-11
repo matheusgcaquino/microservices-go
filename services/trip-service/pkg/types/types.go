@@ -2,6 +2,23 @@ package types
 
 import pb "ride-sharing/shared/proto/trip"
 
+type RideFares struct {
+	PackageSlug       string
+	TotalPriceInCents float64
+}
+
+type PricingConfig struct {
+	PricePerUnitOfDistance float64
+	PricingPerMinute       float64
+}
+
+func DefaultPricingConfig() *PricingConfig {
+	return &PricingConfig{
+		PricePerUnitOfDistance: 1.5,
+		PricingPerMinute:       0.25,
+	}
+}
+
 type OsrmApiResponse struct {
 	Routes []struct {
 		Distance float64 `json:"distance"`
