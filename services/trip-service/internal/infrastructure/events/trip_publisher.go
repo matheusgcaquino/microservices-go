@@ -3,6 +3,7 @@ package events
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"ride-sharing/services/trip-service/internal/domain"
 	"ride-sharing/shared/contracts"
 	"ride-sharing/shared/messaging"
@@ -19,8 +20,9 @@ func NewTripEventPublisher(rabbitmq *messaging.RabbitMQ) *TripEventPublisher {
 }
 
 func (p *TripEventPublisher) PublishTripCreated(ctx context.Context, trip *domain.TripModel) error {
+	fmt.Errorf("trip: %s", trip)
 	payload := messaging.TripEventData{
-		Trip: trip.ToProto(),
+		Trip: TripToProto(trip),
 	}
 
 	tripEventJSON, err := json.Marshal(payload)

@@ -35,3 +35,11 @@ func (repo *inmemRepository) GetRideFare(ctx context.Context, userID string, rid
 	}
 	return rideFare, nil
 }
+
+func (r *inmemRepository) GetTripByID(ctx context.Context, id string) (*domain.TripModel, error) {
+	trip, ok := r.trips[id]
+	if !ok {
+		return nil, nil
+	}
+	return trip, nil
+}

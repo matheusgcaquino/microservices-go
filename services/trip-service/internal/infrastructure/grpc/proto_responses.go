@@ -7,17 +7,11 @@ import (
 )
 
 func PreviewTripResponse(rideFares []*domain.RideFareModel, routes *types.Routes) *pb.PreviewTripResponse {
-	protoRoute := routeToProto(routes.Routes[0])
+	protoRoute := RouteToProto(routes.Routes[0])
 
 	var protoFares []*pb.RideFare
 	for _, fare := range rideFares {
-		protoFares = append(protoFares, &pb.RideFare{
-			Id:                fare.ID,
-			UserID:            fare.UserID,
-			PackageSlug:       fare.PackageSlug,
-			TotalPriceInCents: fare.TotalPriceInCents,
-			Route:             protoRoute,
-		})
+		protoFares = append(protoFares, RideFareToProto(fare))
 	}
 
 	return &pb.PreviewTripResponse{
@@ -26,7 +20,7 @@ func PreviewTripResponse(rideFares []*domain.RideFareModel, routes *types.Routes
 	}
 }
 
-func routeToProto(route *types.Route) *pb.Route {
+func RouteToProto(route *types.Route) *pb.Route {
 	geometry := route.Geometry.Coordinates
 	coordinates := make([]*pb.Coordinate, len(geometry))
 	for i, coord := range geometry {
@@ -49,28 +43,46 @@ func routeToProto(route *types.Route) *pb.Route {
 func CreateTripResponse(trip *domain.TripModel) *pb.CreateTripResponse {
 	var protoDriver *pb.TripDriver
 	if trip.Driver != nil {
-		protoDriver = &pb.TripDriver{
-			Id:             trip.Driver.ID,
-			Name:           trip.Driver.Name,
-			ProfilePicture: trip.Driver.ProfilePicture,
-			CarPlate:       trip.Driver.CarPlate,
-		}
+		protoDriver = DriverToProto(trip.Driver)
 	}
 
 	return &pb.CreateTripResponse{
 		TripID: trip.ID,
 		Trip: &pb.Trip{
-			Id:     trip.ID,
-			UserID: trip.UserID,
-			Status: trip.Status,
-			SelectedFare: &pb.RideFare{
-				Id:                trip.RideFare.ID,
-				UserID:            trip.RideFare.UserID,
-				PackageSlug:       trip.RideFare.PackageSlug,
-				TotalPriceInCents: trip.RideFare.TotalPriceInCents,
-				Route:             routeToProto(trip.RideFare.Route),
-			},
-			Driver: protoDriver,
+			Id:           trip.ID,
+			UserID:       trip.UserID,
+			Status:       trip.Status,
+			SelectedFare: RideFareToProto(trip.RideFare),
+			Driver:       protoDriver,
 		},
+	}
+}
+
+func RideFareToProto(fare *domain.RideFareModel) *pb.RideFare {
+	return &pb.RideFare{
+		Id:                fare.ID,
+		UserID:            fare.UserID,
+		PackageSlug:       fare.PackageSlug,
+		TotalPriceInCents: fare.TotalPriceInCents,
+		Route:             RouteToProto(fare.Route),
+	}
+}
+
+func DriverToProto(driver *domain.DriverModel) *pb.TripDriver {
+	return &pb.TripDriver{
+		Id:             driver.ID,
+		Name:           driver.Name,
+		ProfilePicture: driver.ProfilePicture,
+		CarPlate:       driver.CarPlate,
+	}
+}
+
+func TripToProto(t *domain.TripModel) *pb.Trip {
+	return &pb.Trip{
+		Id:           t.ID,
+		UserID:       t.UserID,
+		SelectedFare: RideFareToProto(t.RideFare),
+		Status:       t.Status,
+		Driver:       DriverToProto(t.Driver),
 	}
 }

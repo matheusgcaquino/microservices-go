@@ -22,3 +22,9 @@ func NewTrip(
 		Driver:   nil,
 	}, nil
 }
+
+func (t *TripModel) NewDriver(ctx context.Context, driver *DriverModel) error {
+	t.Status = "ACCEPTED"
+	t.Driver = driver
+	return nil
+}

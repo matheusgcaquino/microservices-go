@@ -14,6 +14,7 @@ type TripRepository interface {
 	SaveTrip(ctx context.Context, trip *domain.TripModel) error
 	SaveRideFare(ctx context.Context, rideFare *domain.RideFareModel) error
 	GetRideFare(ctx context.Context, userID string, rideFareId string) (*domain.RideFareModel, error)
+	GetTripByID(ctx context.Context, id string) (*domain.TripModel, error)
 }
 
 type Router interface {
@@ -35,7 +36,7 @@ func NewTripService(repo TripRepository, router Router) *TripService {
 func (s *TripService) CreateTrip(ctx context.Context, userID string, rideFareId string) (*domain.TripModel, error) {
 	rideFare, err := s.repo.GetRideFare(ctx, userID, rideFareId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get ride fare: %w", err)
+		return nil, err
 	}
 
 	trip, error := domain.NewTrip(ctx, uuid.NewString(), rideFare)
@@ -74,4 +75,31 @@ func (s *TripService) PreviewTrip(ctx context.Context, userID string, pickup *ty
 	}
 
 	return rideFares, routes, nil
+}
+
+func (s *TripService) GetTripByID(ctx context.Context, id string) (*domain.TripModel, error) {
+	return s.repo.GetTripByID(ctx, id)
+}
+
+func (s *TripService) TripAccepted(ctx context.Context, tripID string, driver *domain.DriverModel) (*domain.TripModel, error) {
+	trip, err := s.repo.GetTripByID(ctx, tripID)
+	if err != nil {
+		return nil, err
+	}
+
+	if trip == nil {
+		return nil, fmt.Errorf("Trip was not found %s", tripID)
+	}
+
+	err = trip.NewDriver(ctx, driver)
+	if err != nil {
+		return nil, fmt.Errorf("failed to assign driver to trip: %w", err)
+	}
+
+	err = s.repo.SaveTrip(ctx, trip)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save trip: %w", err)
+	}
+
+	return trip, nil
 }
